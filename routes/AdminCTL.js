@@ -76,6 +76,17 @@ router.post('/createAccount', upload.single('photo'), async(req, res) => {
     }
 });
 
+// Récupérer tous les administrateurs
+router.get('/getAll', async(req, res) => {
+    try {
+        const adminsList = await admin.findAll();
+        res.status(200).send(adminsList);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Erreur lors de la récupération des administrateurs.');
+    }
+});
+
 // Connexion d'un administrateur
 router.post('/login', async(req, res) => {
     try {
@@ -89,7 +100,7 @@ router.post('/login', async(req, res) => {
             return res.status(400).send('Mot de passe incorrect.');
         }
 
-        res.json(existingAdmin.id);
+        res.json({ id: existingAdmin.id });
     } catch (error) {
         console.error(error);
         res.status(500).send('Erreur lors de la connexion.');
@@ -165,6 +176,23 @@ router.put('/UpdateuserPassword/:id', async(req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).send('Erreur lors de la mise à jour du mot de passe.');
+    }
+});
+
+// Supprimer un administrateur
+router.delete('/delete/:id', async(req, res) => {
+    try {
+        const adminId = req.params.id;
+        const deleted = await admin.destroy({ where: { id: adminId } });
+
+        if (!deleted) {
+            return res.status(404).send('Administrateur non trouvé.');
+        }
+
+        res.status(200).send('Administrateur supprimé avec succès.');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Erreur lors de la suppression de l\'administrateur.');
     }
 });
 
